@@ -56,7 +56,7 @@ class Graashoppersbb:
         prev_bids = prev_round.bids
         clicks = prev_round.clicks
         info = self.slot_info(t, history, reserve)
-        print(info, len(info))
+        # print(info, len(info))
 
         for i in range(len(info)):
             # pos_i-1 * (v_i - b_i)
@@ -95,7 +95,6 @@ class Graashoppersbb:
         (slot, min_bid, max_bid) = self.target_slot(t, history, reserve)
 
         # TODO: Fill this in.
-
         prev_clicks = prev_round.clicks
 
         # Not expecting to win

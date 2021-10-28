@@ -11,9 +11,12 @@ class Graashoppersbudget:
         self.id = id
         self.value = value
         self.budget = budget
+        self.bids = []
 
     def initial_bid(self, reserve):
-        return self.value / 2
+        bid = self.value / 2
+        self.bids.append(bid)
+        return bid
 
 
     def slot_info(self, t, history, reserve):
@@ -52,6 +55,16 @@ class Graashoppersbudget:
         # TODO: Fill this in
         utilities = []   # Change this
 
+        prev_round = history.round(t-1)
+        prev_bids = prev_round.bids
+        clicks = prev_round.clicks
+        info = self.slot_info(t, history, reserve)
+        print(info, len(info))
+
+        for i in range(len(info)):
+            # pos_i-1 * (v_i - b_i)
+            exp_util = clicks[i] * (self.value - info[i][1])
+            utilities.append(exp_util)
         
         return utilities
 
@@ -82,8 +95,19 @@ class Graashoppersbudget:
         (slot, min_bid, max_bid) = self.target_slot(t, history, reserve)
 
         # TODO: Fill this in.
-        bid = 0  # change this
-        
+
+        bid = 0
+
+        # If number of clicks is decreasing, bid less
+        if t > 0 and t <= 24:
+            bid = self.bids[t-1] * 0.75
+            
+        # If number of clicks is increasing, bid more
+        elif t > 24 and t <= 48:
+            bid = self.bids[t-1] * 1.75
+
+        big = min(bid, self.value)
+        self.bids.append(bid)
         return bid
 
     def __repr__(self):
