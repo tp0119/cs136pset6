@@ -51,9 +51,20 @@ class Graashoppersbb:
         """
         # TODO: Fill this in
         utilities = []   # Change this
-
         
+        prev_round = history.round(t-1)
+        prev_bids = prev_round.bids
+        clicks = prev_round.clicks
+        info = self.slot_info(t, history, reserve)
+        print(info, len(info))
+
+        for i in range(len(info)):
+            # pos_i-1 * (v_i - b_i)
+            exp_util = clicks[i] * (self.value - info[i][1])
+            utilities.append(exp_util)
+                
         return utilities
+
 
     def target_slot(self, t, history, reserve):
         """Figure out the best slot to target, assuming that everyone else
@@ -67,6 +78,7 @@ class Graashoppersbb:
         info = self.slot_info(t, history, reserve)
         return info[i]
 
+
     def bid(self, t, history, reserve):
         # The Balanced bidding strategy (BB) is the strategy for a player j that, given
         # bids b_{-j},
@@ -79,12 +91,27 @@ class Graashoppersbb:
         # If s*_j is the top slot, bid the value v_j
 
         prev_round = history.round(t-1)
+        # Get target slot s*_j that maximizes utility
         (slot, min_bid, max_bid) = self.target_slot(t, history, reserve)
 
         # TODO: Fill this in.
-        bid = 0  # change this
+
+        prev_clicks = prev_round.clicks
+
+        # Not expecting to win
+        if min_bid >= self.value:
+            bid = self.value
+        else:
+            # Not going for the top
+            if slot > 0:
+                # clicks_{s*_j} (v_j - t_{s*_j}(j)) = clicks_{s*_j-1}(v_j - b')
+                bid = self.value - ((prev_clicks[slot] * (self.value - min_bid)) / prev_clicks[slot - 1])
+            # Going for the top
+            elif slot == 0:
+                bid = self.value
         
-        return bid
+        return  int(bid)
+
 
     def __repr__(self):
         return "%s(id=%d, value=%d)" % (
